@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Intsinzi Exam Lab – National Exam Simulator</title>
+<style>
+:root{--bg:#0b1a2e;--card:#10243d;--in:#0c1c31;--ln:#24405f;--tx:#e8eef7;--mu:#8fa6c2;--gold:#f2b705}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px system-ui,sans-serif}
+.w{max-width:1000px;margin:auto;padding:16px}h1,h2{font-family:Georgia,serif;margin:.2em 0}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.pills span{background:#12315a;border-radius:20px;padding:6px 12px;font-size:13px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.g{grid-template-columns:1fr}}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px}
+label{display:block;font-weight:700;margin:12px 0 5px}input,select{width:100%;padding:11px;background:var(--in);color:var(--tx);border:1px solid var(--ln);border-radius:8px;font-size:15px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}button{cursor:pointer;border:0;border-radius:8px;padding:13px;font-weight:700;font-size:16px;background:var(--gold);color:#111;width:100%;margin-top:14px}
+button.s{background:#1c3a5e;color:var(--tx);width:auto;padding:8px 12px;font-size:13px;margin:2px}button:disabled{opacity:.5}
+.mu{color:var(--mu);font-size:13px}.hide{display:none}.box{background:var(--in);border:1px dashed var(--ln);border-radius:8px;padding:12px;margin-top:10px}
+#bar{position:sticky;top:0;background:var(--bg);padding:10px 0;display:flex;justify-content:space-between;font-weight:700;z-index:5;border-bottom:1px solid var(--ln)}
+.q{margin:14px 0}.q label{font-weight:400;margin:4px 0;padding:9px;background:var(--in);border-radius:8px;display:flex;gap:8px}.q input{width:auto}
+.bar{height:8px;background:var(--in);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--ln);padding:6px;text-align:left}footer{padding:20px 0;color:var(--mu);font-size:13px}
+</style></head><body><div class="w">
+<h1>Intsinzi Exam Lab</h1><div class="mu">National Exam Simulator · Primary, O-Level and A-Level</div>
+
+<!-- HOME -->
+<div id="home"><div class="pills" id="pills"></div><div class="g">
+<div class="c"><h2>Candidate</h2><div class="mu">Your identity stays private: you receive an anonymous candidate ID.</div>
+<div class="r2"><div><label>Level</label><select id="lv"></select></div><div><label>Subject</label><select id="sb"></select></div></div>
+<div class="r2"><div><label>Exam type</label><select id="ex"><option>Standard</option><option>Mock_Grade1</option><option>Mock_Grade2</option><option>Mock_Grade3</option></select></div><div><label>Questions</label><input id="n" type="number" min="5" max="100" value="50"></div></div>
+<label>Minutes</label><input id="min" type="number" min="10" max="240" value="120" style="width:50%">
+<div id="pn" class="box hide"><b>Proctored exam</b><div class="mu">Mock_Grade3 needs a quiet room, your camera and microphone on, and this window kept open. Suspicious sound, movement, extra people, a hidden face or leaving the window gives you 2 warnings; the 3rd blocks your exam. Video is processed on your device and is not uploaded or stored.</div></div>
+<label>Access code</label><input id="code" placeholder="Enter your code after payment">
+<div id="pay" class="box"><b id="pt"></b><div class="mu" id="pm"></div>
+<select id="plan" style="margin-top:8px"></select>
+<input id="ph" placeholder="Your MoMo number (07xxxxxxxx)" style="margin-top:8px"><input id="ref" placeholder="Transaction ID from payment SMS" style="margin-top:8px">
+<button class="s" id="pb" style="margin-top:8px">I have paid, request confirmation</button><div id="ps" class="mu" style="margin-top:6px"></div></div>
+<label style="font-weight:400"><input type="checkbox" id="keep" checked style="width:auto"> Save my result anonymously to candidate records</label>
+<button id="go">Continue</button><div id="err" style="color:#ff8a8a;margin-top:8px"></div></div>
+<div class="c"><h2>Learning materials</h2><div class="mu">Optional. Upload books, teachers' guides, notes or past papers (PDF, images, text and more). Questions are drawn from random parts each time. Without uploads, questions follow the standard curriculum.</div>
+<input type="file" id="fl" multiple style="margin-top:12px"><div class="mu" style="margin-top:8px">Max 6 files, 12 MB each. Plain text, PDF and images work best.</div></div></div></div>
+
+<!-- EXAM -->
+<div id="exam" class="hide"><div id="bar"><span id="who"></span><span id="tm"></span></div><div id="wn" class="hide" style="background:#7a1f1f;padding:10px;border-radius:8px;margin:8px 0"></div><div id="qs"></div><button id="sub">Submit answers</button></div>
+
+<!-- RESULT -->
+<div id="res" class="hide"></div>
+
+<!-- ADMIN (open with #admin) -->
+<div id="adm" class="hide c"><h2>Owner / Developer panel</h2><input id="ak" type="password" placeholder="Admin key (free developer access too)"><button class="s" id="al">Load</button>
+<div id="ad" class="hide"><h2>Settings</h2><div class="r2"><div><label>Price per exam</label><input id="sp"></div><div><label>30-day bundle price</label><input id="sbp"></div><div><label>Bundle days</label><input id="sd"></div><div><label>Payment mode</label><select id="sm"><option value="manual">Manual MoMo confirmation</option><option value="single">Per-exam only (no 30-day pass)</option><option value="off">Free (no payment)</option></select></div></div>
+<label>MoMo numbers (comma separated)</label><input id="smo"><button class="s" id="ss">Save settings</button> <button class="s" id="sc">Generate single code</button> <span id="sco"></span>
+<h2>Payments</h2><div style="overflow:auto"><table id="pt2"></table></div><h2>Anonymous records</h2><div style="overflow:auto"><table id="rt"></table></div></div></div>
+
+<footer id="ft"></footer></div>
+<script>
+const B={P:['Mathematics','English','Kinyarwanda','Science & Elementary Technology','Social Studies'],O:['Mathematics','English','Kinyarwanda','Physics','Chemistry','Biology','History','Geography','Entrepreneurship','ICT'],A:['Mathematics','Physics','Chemistry','Biology','Geography','History','Economics','Literature in English','Entrepreneurship','Computer Science']};
+const L={'Primary P5':B.P,'Primary P6':B.P,'O-Level S2':B.O,'O-Level S3':B.O,'A-Level S5':B.A,'A-Level S6':B.A};
+const $=i=>document.getElementById(i),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>'FRW '+Number(n).toLocaleString();let cfg,S,T,A=[];
+const api=(u,o={})=>fetch(u,o).then(async r=>{const j=await r.json();if(!r.ok)throw new Error(j.error||'Error');return j});
+const J=(b,h={})=>({method:'POST',headers:{'content-type':'application/json',...h},body:JSON.stringify(b)});
+$('lv').innerHTML=Object.keys(L).map(k=>`<option>${k}</option>`).join('');
+$('lv').onchange=()=>$('sb').innerHTML=L[$('lv').value].map(k=>`<option>${k}</option>`).join('');$('lv').onchange();$('ex').onchange=()=>$('pn').classList.toggle('hide',$('ex').value!=='Mock_Grade3');
+async function init(){cfg=await api('/api/config');const f=cfg.payments==='off';
+$('pills').innerHTML=['Primary, O-Level and A-Level','50 questions in 120 minutes (adjustable)','Mock Grade 1–3 papers','Instant marks and revision advice',f?'Free access':fmt(cfg.price)+' per exam'+(cfg.payments==='single'?'':', or '+fmt(cfg.bundlePrice)+' for a '+cfg.bundleDays+'-day pass'),'Anonymous, optional records'].map(x=>`<span>${x}</span>`).join('');
+$('pay').classList.toggle('hide',f);$('pt').textContent='Pay to get your access code';
+$('pm').innerHTML='Send the amount by Mobile Money to <b>'+cfg.momo.join(' or ')+'</b>, then enter your number and transaction ID. Your code appears here once the owner confirms.';
+$('plan').innerHTML=`<option value="single">Single exam · ${fmt(cfg.price)}</option>${cfg.payments==='single'?'':'<option value="bundle">'+cfg.bundleDays+'-day pass · '+fmt(cfg.bundlePrice)+'</option>'}`;
+$('ft').textContent='Support and payment confirmation: '+cfg.momo.join(' or ')+'. Intsinzi Exam Lab is an independent exam-practice tool, not affiliated with or endorsed by REB or NESA. Use official past papers alongside it.'}
+$('pb').onclick=async()=>{try{const p=await api('/api/pay',J({phone:$('ph').value.trim(),ref:$('ref').value.trim(),plan:$('plan').value}));$('ps').textContent='Submitted. Waiting for owner confirmation...';
+const iv=setInterval(async()=>{const s=await api('/api/pay/'+p.id).catch(()=>({}));if(s.status==='confirmed'){clearInterval(iv);$('code').value=s.code;$('ps').textContent='Confirmed! Your code: '+s.code+' (keep it safe).'}else if(s.status==='rejected'){clearInterval(iv);$('ps').textContent='Payment not confirmed. Please contact support.'}},5000)}catch(e){$('ps').textContent=e.message}};
+$('go').onclick=async()=>{$('err').textContent='';$('go').disabled=true;$('go').textContent='Preparing your unique exam... (up to a minute)';
+try{if($('ex').value==='Mock_Grade3')await camOn();const fd=new FormData();fd.append('level',$('lv').value);fd.append('subject',$('sb').value);fd.append('exam',$('ex').value);fd.append('n',$('n').value);fd.append('min',$('min').value);fd.append('code',$('code').value.trim());fd.append('keep',$('keep').checked?'1':'0');for(const f of $('fl').files)fd.append('files',f);
+S=await api('/api/start',{method:'POST',body:fd});A=new Array(S.qs.length).fill(null);
+$('home').classList.add('hide');$('exam').classList.remove('hide');$('who').textContent=S.anon+' · '+$('sb').value;
+$('qs').innerHTML=S.qs.map((q,i)=>`<div class="q"><b>${i+1}. ${esc(q.q)}</b>${q.o.map((o,j)=>`<label><input type="radio" name="q${i}" onchange="A[${i}]=${j}"> ${esc(o)}</label>`).join('')}</div>`).join('');
+T=setInterval(tick,500);tick();if(S.proc)watch()}catch(e){camOff();$('err').textContent=e.message}$('go').disabled=false;$('go').textContent='Continue'};
+function tick(){const s=Math.max(0,Math.floor((S.end-Date.now())/1000));$('tm').textContent='Time left: '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0');if(!s){clearInterval(T);submit()}}
+$('sub').onclick=()=>{if(confirm('Submit your answers now?')){clearInterval(T);submit()}};
+async function submit(){camOff();$('sub').disabled=true;document.querySelectorAll('#qs input').forEach(i=>i.disabled=true);
+try{const r=await api('/api/submit',J({sid:S.sid,answers:A}));if(r.blocked){$('exam').classList.add('hide');const b=$('res');b.classList.remove('hide');b.innerHTML=`<div class="c"><h2>Exam blocked · ${r.anon}</h2><p>Your exam was ended after three malpractice alerts. No marks are awarded for this attempt.</p><button onclick="location.reload()">Back to start</button></div>`;return}$('exam').classList.add('hide');const v=$('res');v.classList.remove('hide');
+v.innerHTML=`<div class="c"><h2>Results · ${r.anon}</h2><h1>${r.score}/${r.n} (${r.pct}%) · ${r.label}</h1>
+<h2>Topic performance</h2>${Object.entries(r.topics).map(([k,t])=>`<div>${esc(k)} · ${t.ok}/${t.n}<div class="bar"><i style="width:${t.ok/t.n*100}%"></i></div></div>`).join('')}
+<h2>Recommendations</h2><ul>${r.recs.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+<details><summary>Review ${r.wrong.length} missed question(s)</summary>${r.wrong.map(w=>`<div class="box"><b>${esc(w.q)}</b><br>Your answer: ${w.yours?esc(w.yours):'(none)'}<br>Correct: ${esc(w.right)}<br><span class="mu">${esc(w.why||'')}</span></div>`).join('')}</details>
+<button onclick="location.reload()">Take another exam</button></div>`}catch(e){$('exam').innerHTML=`<div class="c"><h2>${esc(e.message)}</h2><button onclick="location.reload()">Back to start</button></div>`}}
+// ---- proctoring (Mock_Grade3): camera, sound, movement, face, tab-switch ----
+let ST, VID, last = 0, prev = null, rafs = [];
+async function camOn() {
+  try { ST = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); }
+  catch { throw new Error('Mock_Grade3 requires camera and microphone access. Please allow both and try again.'); }
+  VID = document.createElement('video'); VID.srcObject = ST; VID.muted = true; VID.playsInline = true;
+  VID.style.cssText = 'position:fixed;right:10px;bottom:10px;width:150px;border:2px solid var(--gold);border-radius:8px;z-index:9';
+  document.body.appendChild(VID); await VID.play();
+}
+function camOff() { rafs.forEach(clearInterval); rafs = []; if (ST) ST.getTracks().forEach(t => t.stop()); ST = null; if (VID) VID.remove(); VID = null; document.removeEventListener('visibilitychange', vis); }
+const vis = () => { if (document.hidden) flag('Left the exam window'); };
+async function flag(kind) {
+  const now = Date.now(); if (now - last < 6000 || !S || !ST) return; last = now;
+  try {
+    const r = await api('/api/violation', J({ sid: S.sid, kind }));
+    if (r.blocked) { clearInterval(T); submit(); return; }
+    if (r.ignored) return;
+    $('wn').textContent = `Warning ${r.count} of 2: ${kind}. A third malpractice will block your exam.`;
+    $('wn').classList.remove('hide'); setTimeout(() => $('wn').classList.add('hide'), 8000);
+  } catch {}
+}
+function watch() {
+  document.addEventListener('visibilitychange', vis); prev = null;
+  const ac = new AudioContext(), an = ac.createAnalyser(); ac.createMediaStreamSource(ST).connect(an);
+  const buf = new Float32Array(an.fftSize); let base = 0, k = 0, loud = 0, nf = 0;
+  const cv = document.createElement('canvas'); cv.width = 64; cv.height = 48; const cx = cv.getContext('2d', { willReadFrequently: true });
+  const fd = 'FaceDetector' in window ? new FaceDetector() : null;
+  rafs.push(setInterval(async () => {
+    if (!ST) return;
+    an.getFloatTimeDomainData(buf); const rms = Math.sqrt(buf.reduce((s, x) => s + x * x, 0) / buf.length);
+    if (k < 8) { base = Math.max(base, rms); k++; }            // first 4s: calibrate room noise
+    else { loud = rms > Math.max(.06, base * 3) ? loud + 1 : 0; if (loud >= 3) { loud = 0; flag('Suspicious sound detected'); } }
+    cx.drawImage(VID, 0, 0, 64, 48); const d = cx.getImageData(0, 0, 64, 48).data;
+    if (prev) { let c = 0; for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - prev[i]) > 45) c++; if (c / 3072 > .25) flag('Suspicious movement detected'); }
+    prev = d;
+    if (fd) { const f = await fd.detect(VID).catch(() => null); if (f) { nf = f.length !== 1 ? nf + 1 : 0; if (nf >= 6) { nf = 0; flag(f.length ? 'More than one person in view' : 'Face not visible'); } } }
+  }, 500));
+}
+// ---- admin ----
+const H=()=>({'x-admin-key':$('ak').value});
+async function load(){const d=await api('/api/admin/data',{headers:H()});const s=d.settings;$('ad').classList.remove('hide');$('sp').value=s.price;$('sbp').value=s.bundlePrice;$('sd').value=s.bundleDays;$('sm').value=s.payments;$('smo').value=s.momo.join(', ');
+$('pt2').innerHTML='<tr><th>Phone</th><th>Ref</th><th>Plan</th><th>Amount</th><th>Status</th><th></th></tr>'+d.pays.map(p=>`<tr><td>${esc(p.phone)}</td><td>${esc(p.ref)}</td><td>${p.plan}</td><td>${p.amount}</td><td>${p.status}</td><td>${p.status==='pending'?`<button class="s" onclick="act('confirm','${p.id}')">Confirm</button><button class="s" onclick="act('reject','${p.id}')">Reject</button>`:''}</td></tr>`).join('');
+$('rt').innerHTML='<tr><th>Date</th><th>ID</th><th>Level</th><th>Subject</th><th>Exam</th><th>Score</th></tr>'+d.records.map(x=>`<tr><td>${x.date.slice(0,10)}</td><td>${x.anon}</td><td>${esc(x.level)}</td><td>${esc(x.subject)}</td><td>${esc(x.exam)}</td><td>${x.blocked?'BLOCKED ('+esc((x.violations||[]).join('; '))+')':x.score+'/'+x.n+' ('+x.pct+'%)'}</td></tr>`).join('')}
+const act=async(a,id)=>{await api('/api/admin/'+a,J({id},H()));load()};
+$('al').onclick=()=>load().catch(e=>alert(e.message));
+$('ss').onclick=async()=>{await api('/api/admin/settings',J({price:$('sp').value,bundlePrice:$('sbp').value,bundleDays:$('sd').value,payments:$('sm').value,momo:$('smo').value},H()));alert('Saved')};
+$('sc').onclick=async()=>{const r=await api('/api/admin/code',J({plan:'single'},H()));$('sco').textContent=r.code};
+if(location.hash==='#admin'){$('home').classList.add('hide');$('adm').classList.remove('hide')}
+init();
+</script></body></html>
